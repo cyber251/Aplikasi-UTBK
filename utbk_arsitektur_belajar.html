@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTBK Arsitektur</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #f5f0e8;
+    --amber: #c8862a;
+    --amber-light: #e8b96a;
+    --rust: #8b3a1e;
+    --sage: #4a6741;
+    --grid: rgba(200,134,42,0.12);
+    --line: rgba(26,20,16,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Blueprint grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    height: 56px;
+    border-bottom: 3px solid var(--amber);
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
+  }
+  .nav-logo span { color: var(--amber-light); font-style: italic; }
+  .nav-tabs { display: flex; gap: 0; }
+  .nav-tab {
+    padding: 0 1.2rem;
+    height: 56px;
+    display: flex; align-items: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    transition: background 0.2s, color 0.2s;
+    color: rgba(245,240,232,0.7);
+  }
+  .nav-tab:hover, .nav-tab.active {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .nav-score {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  .nav-score strong { color: var(--amber-light); }
+
+  /* ── MAIN ── */
+  main { position: relative; z-index: 1; }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── HERO (HOME) ── */
+  .hero {
+    min-height: calc(100vh - 56px);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    padding: 0.3rem 1rem;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.05;
+    max-width: 700px;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--amber); }
+  .hero p {
+    max-width: 480px;
+    color: rgba(26,20,16,0.65);
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.75rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 2px solid var(--ink);
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--amber); border-color: var(--amber); color: var(--ink); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    padding: 0.75rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 2px solid var(--ink);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+
+  /* Cards grid */
+  .cards-section { padding: 0 2rem 4rem; max-width: 1100px; margin: 0 auto; }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--line);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--line);
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+  .card {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transition: transform 0.25s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,20,16,0.1); }
+  .card:hover::before { transform: scaleX(1); }
+  .card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .card-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+  .card-desc { font-size: 0.8rem; color: rgba(26,20,16,0.6); line-height: 1.6; margin-bottom: 1rem; }
+  .card-meta { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); }
+
+  /* Stats bar */
+  .stats-bar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+    gap: 1px;
+  }
+  .stat { padding: 1rem; }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--amber-light); }
+  .stat-lbl { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-top: 0.25rem; }
+
+  /* ── QUIZ VIEW ── */
+  .quiz-container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .quiz-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .quiz-meta { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+  .quiz-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-top: 0.3rem; }
+  .timer-box {
+    background: var(--ink); color: var(--paper);
+    padding: 0.5rem 1rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    min-width: 80px; text-align: center;
+    border: 2px solid var(--amber);
+  }
+  .progress-bar {
+    height: 4px; background: var(--line);
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%; background: var(--amber);
+    transition: width 0.4s ease;
+  }
+  .question-num {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(26,20,16,0.5); margin-bottom: 0.75rem;
+  }
+  .question-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  .question-sub {
+    font-size: 0.85rem; color: rgba(26,20,16,0.6);
+    line-height: 1.6; margin-bottom: 2rem;
+  }
+  .options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+  .option {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1.5px solid var(--line);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+  }
+  .option:hover { border-color: var(--amber); background: rgba(200,134,42,0.04); }
+  .option.selected { border-color: var(--ink); background: rgba(26,20,16,0.04); }
+  .option.correct { border-color: var(--sage); background: rgba(74,103,65,0.08); }
+  .option.wrong { border-color: var(--rust); background: rgba(139,58,30,0.08); }
+  .option-letter {
+    width: 28px; height: 28px;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    flex-shrink: 0;
+    color: rgba(26,20,16,0.4);
+    transition: all 0.15s;
+  }
+  .option:hover .option-letter { color: var(--amber); border-color: var(--amber); }
+  .option.selected .option-letter { color: var(--ink); border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .option.correct .option-letter { background: var(--sage); border-color: var(--sage); color: white; }
+  .option.wrong .option-letter { background: var(--rust); border-color: var(--rust); color: white; }
+  .option-text { font-size: 0.9rem; line-height: 1.55; padding-top: 0.1rem; }
+  .explanation {
+    background: rgba(74,103,65,0.08);
+    border-left: 3px solid var(--sage);
+    padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation strong { color: var(--sage); }
+  .quiz-footer { display: flex; justify-content: space-between; align-items: center; }
+  .btn-nav {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.82rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    border: 2px solid var(--ink);
+    background: transparent; color: var(--ink);
+  }
+  .btn-nav:hover { background: var(--ink); color: var(--paper); }
+  .btn-nav.primary { background: var(--ink); color: var(--paper); }
+  .btn-nav.primary:hover { background: var(--amber); border-color: var(--amber); color: var(--ink); }
+  .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ── MATERI VIEW ── */
+  .materi-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  .materi-grid { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start; }
+  .materi-sidebar { position: sticky; top: 70px; }
+  .sidebar-box { border: 1px solid var(--line); background: white; }
+  .sidebar-head {
+    background: var(--ink); color: var(--paper);
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .sidebar-item {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .sidebar-item:hover { background: rgba(200,134,42,0.07); padding-left: 1.25rem; }
+  .sidebar-item.active { background: var(--amber); color: var(--ink); font-weight: 600; }
+  .sidebar-item:last-child { border-bottom: none; }
+  .materi-content { min-height: 400px; }
+  .materi-panel { display: none; }
+  .materi-panel.active { display: block; }
+  .materi-panel h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .materi-panel .lead {
+    font-size: 0.95rem; color: rgba(26,20,16,0.6);
+    line-height: 1.7; margin-bottom: 2rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--line);
+  }
+  .materi-section { margin-bottom: 2rem; }
+  .materi-section h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--amber); }
+  .materi-section p { font-size: 0.9rem; line-height: 1.75; margin-bottom: 0.75rem; }
+  .info-box {
+    background: var(--ink); color: var(--paper);
+    padding: 1.25rem 1.5rem; margin: 1.5rem 0;
+    border-left: 4px solid var(--amber-light);
+  }
+  .info-box h4 { font-family: 'DM Serif Display', serif; color: var(--amber-light); margin-bottom: 0.5rem; }
+  .info-box p { font-size: 0.85rem; line-height: 1.65; opacity: 0.85; }
+  .term-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+  .term {
+    border: 1px solid var(--line); padding: 0.75rem;
+    background: rgba(200,134,42,0.04);
+  }
+  .term dt { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.25rem; }
+  .term dd { font-size: 0.82rem; line-height: 1.5; }
+
+  /* ── RESULT VIEW ── */
+  .result-container { max-width: 600px; margin: 0 auto; padding: 3rem 2rem; text-align: center; }
+  .result-score-circle {
+    width: 160px; height: 160px;
+    border: 6px solid var(--amber);
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 2rem auto;
+  }
+  .result-score-num { font-family: 'DM Serif Display', serif; font-size: 3rem; color: var(--amber); line-height: 1; }
+  .result-score-lbl { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+  .result-grade { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 0.5rem; }
+  .result-msg { font-size: 0.9rem; color: rgba(26,20,16,0.6); line-height: 1.6; margin-bottom: 2rem; }
+  .result-breakdown {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); margin-bottom: 2rem;
+  }
+  .breakdown-cell { background: white; padding: 1rem 0.5rem; }
+  .breakdown-num { font-family: 'DM Serif Display', serif; font-size: 1.5rem; }
+  .breakdown-lbl { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; margin-top: 0.2rem; }
+
+  @media (max-width: 640px) {
+    .stats-bar { grid-template-columns: repeat(2,1fr); }
+    .materi-grid { grid-template-columns: 1fr; }
+    .materi-sidebar { position: static; }
+    .term-grid { grid-template-columns: 1fr; }
+    .nav-tab span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">UTBK <span>Arsitektur</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showView('home')">🏠 <span>Beranda</span></div>
+    <div class="nav-tab" onclick="showView('materi')">📐 <span>Materi</span></div>
+    <div class="nav-tab" onclick="startQuiz('tpa')">📝 <span>TPA</span></div>
+    <div class="nav-tab" onclick="startQuiz('ars')">🏛️ <span>Arsitektur</span></div>
+  </div>
+  <div class="nav-score">Skor: <strong id="totalScore">0</strong></div>
+</nav>
+
+<main>
+  <!-- HOME -->
+  <div class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-label">Platform Belajar UTBK</div>
+      <h1>Siap Masuk Jurusan <em>Arsitektur</em> Impianmu</h1>
+      <p>Latihan soal TPA, pemahaman materi desain & ruang, serta tips strategi ujian khusus calon mahasiswa Arsitektur.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="startQuiz('ars')">Mulai Latihan Soal</button>
+        <button class="btn-secondary" onclick="showView('materi')">Pelajari Materi</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num">120+</div><div class="stat-lbl">Soal Latihan</div></div>
+      <div class="stat"><div class="stat-num">4</div><div class="stat-lbl">Kategori Soal</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-lbl">Topik Materi</div></div>
+      <div class="stat"><div class="stat-num">95%</div><div class="stat-lbl">Tingkat Kepuasan</div></div>
+    </div>
+
+    <div class="cards-section">
+      <div class="section-title">Latihan Soal</div>
+      <div class="cards">
+        <div class="card" onclick="startQuiz('tpa')">
+          <div class="card-icon">🧩</div>
+          <div class="card-title">TPA — Figural</div>
+          <div class="card-desc">Kemampuan visual-spasial, rotasi bangun, pola gambar, dan persepsi bentuk.</div>
+          <div class="card-meta">20 Soal · 25 Menit</div>
+        </div>
+        <div class="card" onclick="startQuiz('verbal')">
+          <div class="card-icon">📖</div>
+          <div class="card-title">TPA — Verbal</div>
+          <div class="card-desc">Sinonim, antonim, analogi kata, dan pemahaman bacaan istilah arsitektur.</div>
+          <div class="card-meta">25 Soal · 30 Menit</div>
+        </div>
+        <div class="card" onclick="startQuiz('ars')">
+          <div class="card-icon">🏛️</div>
+          <div class="card-title">Pengetahuan Arsitektur</div>
+          <div class="card-desc">Sejarah, gaya arsitektur, tokoh, struktur bangunan, dan estetika ruang.</div>
+          <div class="card-meta">30 Soal · 35 Menit</div>
+        </div>
+        <div class="card" onclick="startQuiz('mtk')">
+          <div class="card-icon">📐</div>
+          <div class="card-title">Matematika Dasar</div>
+          <div class="card-desc">Geometri, skala, proporsi, dan perhitungan dasar yang relevan dengan arsitektur.</div>
+          <div class="card-meta">20 Soal · 25 Menit</div>
+        </div>
+      </div>
+
+      <div class="section-title">Topik Materi</div>
+      <div class="cards">
+        <div class="card" onclick="showMateri('sejarah')">
+          <div class="card-icon">🏺</div>
+          <div class="card-title">Sejarah Arsitektur</div>
+          <div class="card-desc">Dari Mesir Kuno hingga Modernisme — gaya dan konteks historisnya.</div>
+          <div class="card-meta">Materi Wajib</div>
+        </div>
+        <div class="card" onclick="showMateri('ruang')">
+          <div class="card-icon">📏</div>
+          <div class="card-title">Teori Ruang & Bentuk</div>
+          <div class="card-desc">Proporsi, skala, ritme, dan prinsip komposisi dalam desain arsitektur.</div>
+          <div class="card-meta">Materi Wajib</div>
+        </div>
+        <div class="card" onclick="showMateri('struktur')">
+          <div class="card-icon">🔩</div>
+          <div class="card-title">Struktur Bangunan</div>
+          <div class="card-desc">Sistem pondasi, kolom, balok, rangka atap, dan material konstruksi.</div>
+          <div class="card-meta">Materi Pendukung</div>
+        </div>
+        <div class="card" onclick="showMateri('tokoh')">
+          <div class="card-icon">👤</div>
+          <div class="card-title">Tokoh Arsitektur</div>
+          <div class="card-desc">Arsitek dunia dan Indonesia yang karyanya sering muncul di soal UTBK.</div>
+          <div class="card-meta">Materi Pendukung</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATERI -->
+  <div class="view" id="view-materi">
+    <div class="materi-container">
+      <div style="padding: 2rem 0 1.5rem; border-bottom: 1px solid var(--line); margin-bottom: 2rem;">
+        <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--amber);margin-bottom:0.4rem;">Materi Belajar</div>
+        <h1 style="font-family:'DM Serif Display',serif;font-size:2rem;">Referensi UTBK Arsitektur</h1>
+      </div>
+      <div class="materi-grid">
+        <div class="materi-sidebar">
+          <div class="sidebar-box">
+            <div class="sidebar-head">Topik</div>
+            <div class="sidebar-item active" onclick="switchMateri('sejarah', this)">🏺 Sejarah Arsitektur</div>
+            <div class="sidebar-item" onclick="switchMateri('ruang', this)">📏 Teori Ruang & Bentuk</div>
+            <div class="sidebar-item" onclick="switchMateri('struktur', this)">🔩 Struktur Bangunan</div>
+            <div class="sidebar-item" onclick="switchMateri('tokoh', this)">👤 Tokoh Arsitektur</div>
+          </div>
+        </div>
+        <div class="materi-content">
+
+          <div class="materi-panel active" id="panel-sejarah">
+            <h2>Sejarah Arsitektur</h2>
+            <p class="lead">Pemahaman tentang evolusi arsitektur dari masa kuno hingga kontemporer sangat penting dalam tes pengetahuan umum arsitektur di UTBK.</p>
+            <div class="materi-section">
+              <h3>Arsitektur Kuno</h3>
+              <p>Arsitektur Mesir Kuno (3100–30 SM) dikenal dengan piramida, kuil, dan obelisk yang menggunakan sistem post-and-lintel. Piramida Giza mencerminkan kepercayaan akan keabadian dan kekuasaan firaun.</p>
+              <p>Arsitektur Yunani Kuno mengembangkan tiga orde utama: <strong>Dorik</strong> (kokoh, sederhana), <strong>Ionik</strong> (langsing, volut), dan <strong>Korintian</strong> (dekoratif, akantus). Parthenon adalah contoh puncak keindahan Dorik.</p>
+            </div>
+            <div class="info-box">
+              <h4>💡 Tips Soal UTBK</h4>
+              <p>Soal seringkali menanyakan ciri khas masing-masing orde Yunani, atau mencocokkan foto bangunan dengan gaya arsitekturnya. Hafalkan ciri visual utama setiap gaya!</p>
+            </div>
+            <div class="materi-section">
+              <h3>Arsitektur Gotik & Renaisans</h3>
+              <p>Gotik (abad 12–16) ditandai oleh pointed arch, flying buttress, dan jendela kaca patri yang dramatis. Katedral Notre Dame de Paris adalah contoh ikonik.</p>
+              <p>Renaisans (abad 15–17) membawa kembali nilai-nilai klasik Yunani-Romawi. Kubah Katedral Santa Maria del Fiore karya Brunelleschi adalah capaian teknik yang revolusioner pada zamannya.</p>
+            </div>
+            <div class="materi-section">
+              <h3>Modern & Kontemporer</h3>
+              <p>Modernisme (awal abad 20) mengusung prinsip "form follows function" (Sullivan), menggunakan material baru: beton, baja, kaca. Bauhaus menjadi tonggak pendidikan desain modern.</p>
+              <p>Postmodernisme merespons kekakuan modern dengan humor, referensi historis, dan warna. Arsitek seperti Robert Venturi dan Michael Graves menjadi tokoh sentralnya.</p>
+            </div>
+          </div>
+
+          <div class="materi-panel" id="panel-ruang">
+            <h2>Teori Ruang & Bentuk</h2>
+            <p class="lead">Prinsip-prinsip dasar komposisi arsitektur yang menjelaskan bagaimana elemen visual menciptakan ruang yang bermakna.</p>
+            <div class="materi-section">
+              <h3>Prinsip Desain Dasar</h3>
+              <dl class="term-grid">
+                <div class="term"><dt>Proporsi</dt><dd>Hubungan ukuran antar elemen. Golden ratio (1:1.618) digunakan sejak zaman Yunani.</dd></div>
+                <div class="term"><dt>Skala</dt><dd>Ukuran relatif elemen terhadap manusia (skala manusia) atau lingkungan sekitarnya.</dd></div>
+                <div class="term"><dt>Ritme</dt><dd>Pengulangan elemen secara teratur untuk menciptakan gerakan visual yang dinamis.</dd></div>
+                <div class="term"><dt>Keseimbangan</dt><dd>Simetri vs asimetri — distribusi visual yang memberikan kesan stabil atau dinamis.</dd></div>
+                <div class="term"><dt>Dominasi</dt><dd>Focal point yang menarik perhatian utama dalam komposisi arsitektur.</dd></div>
+                <div class="term"><dt>Harmoni</dt><dd>Kesatuan visual yang dicapai melalui konsistensi material, warna, dan bentuk.</dd></div>
+              </dl>
+            </div>
+            <div class="materi-section">
+              <h3>Elemen Pembentuk Ruang</h3>
+              <p>Ruang arsitektur dibentuk oleh <strong>lantai, dinding, dan langit-langit</strong>. Namun, ruang juga bisa terbentuk secara implisit melalui kolom, perubahan level, atau batas visual.</p>
+              <p>Konsep <strong>ruang positif</strong> (terisi/solid) dan <strong>ruang negatif</strong> (kosong/void) adalah fundamental dalam desain arsitektur dan sering diuji dalam soal TPA figural.</p>
+            </div>
+          </div>
+
+          <div class="materi-panel" id="panel-struktur">
+            <h2>Struktur Bangunan</h2>
+            <p class="lead">Pemahaman dasar sistem struktural bangunan membantu calon arsitek memahami bagaimana desain dan teknik saling berkaitan.</p>
+            <div class="materi-section">
+              <h3>Sistem Struktur Utama</h3>
+              <p><strong>Post-and-Lintel:</strong> Sistem paling dasar — tiang vertikal menopang balok horizontal. Digunakan sejak zaman prasejarah hingga arsitektur Yunani-Romawi.</p>
+              <p><strong>Arch & Vault:</strong> Busur melengkung mendistribusikan beban ke samping. Romawi mengembangkan barrel vault dan groin vault untuk span yang lebih lebar.</p>
+              <p><strong>Frame Structure:</strong> Rangka kolom dan balok dari baja atau beton bertulang memungkinkan bangunan tinggi (skyscraper). Menjadi sistem dominan di era modern.</p>
+            </div>
+            <div class="info-box">
+              <h4>💡 Material & Propertinya</h4>
+              <p>Batu: kuat tekan, lemah tarik. Baja: kuat tarik & tekan, lentur. Beton: kuat tekan, lemah tarik. Beton bertulang: kombinasi beton + baja = kuat tekan & tarik.</p>
+            </div>
+          </div>
+
+          <div class="materi-panel" id="panel-tokoh">
+            <h2>Tokoh Arsitektur Penting</h2>
+            <p class="lead">Arsitek-arsitek ini sering muncul dalam soal UTBK — kenali nama, karya ikonik, dan kontribusi mereka.</p>
+            <div class="materi-section">
+              <h3>Arsitek Dunia</h3>
+              <dl class="term-grid">
+                <div class="term"><dt>Le Corbusier</dt><dd>5 Poin Arsitektur Modern: pilotis, roof garden, open plan, ribbon windows, free facade.</dd></div>
+                <div class="term"><dt>Frank Lloyd Wright</dt><dd>Organic Architecture. Fallingwater (1935) — integrasi bangunan dengan alam secara dramatis.</dd></div>
+                <div class="term"><dt>Mies van der Rohe</dt><dd>"Less is more." Barcelona Pavilion — minimalis, material mewah, ruang mengalir bebas.</dd></div>
+                <div class="term"><dt>Zaha Hadid</dt><dd>Parametric design & deconstructivism. Bentuk cair, futuristis, menantang gravitasi visual.</dd></div>
+                <div class="term"><dt>Renzo Piano</dt><dd>High-tech architecture. Centre Pompidou (bersama Rogers) — struktur ekspos, warna-warni.</dd></div>
+                <div class="term"><dt>Tadao Ando</dt><dd>Beton ekspos, cahaya alami dramatis. Church of the Light (Osaka, 1989).</dd></div>
+              </dl>
+            </div>
+            <div class="materi-section">
+              <h3>Arsitek Indonesia</h3>
+              <dl class="term-grid">
+                <div class="term"><dt>Friedrich Silaban</dt><dd>Masjid Istiqlal Jakarta (1978) — simbol kemerdekaan RI, desain modern-islami.</dd></div>
+                <div class="term"><dt>Soejoedi Wirjoatmodjo</dt><dd>Gedung DPR/MPR RI, Taman Mini Indonesia Indah, arsitektur nasionalisme.</dd></div>
+                <div class="term"><dt>Ridwan Kamil</dt><dd>Arsitek kontemporer, eks-Wali Kota Bandung. Desain inovatif berwawasan lingkungan.</dd></div>
+                <div class="term"><dt>Han Awal</dt><dd>Pelestarian arsitektur heritage Indonesia, Masjid Raya Makassar.</dd></div>
+              </dl>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="view" id="view-quiz">
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <div>
+          <div class="quiz-meta" id="quizCategory">Latihan Soal</div>
+          <div class="quiz-title" id="quizTitle">UTBK Arsitektur</div>
+        </div>
+        <div class="timer-box" id="timerDisplay">25:00</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="question-num" id="questionNum">Soal 1 dari 10</div>
+      <div class="question-text" id="questionText">Loading...</div>
+      <div class="question-sub" id="questionSub"></div>
+      <div class="options" id="optionsList"></div>
+      <div class="explanation" id="explanation"></div>
+      <div class="quiz-footer">
+        <button class="btn-nav" id="btnBack" onclick="prevQuestion()" disabled>← Sebelumnya</button>
+        <span id="dotNav" style="font-size:0.75rem;color:rgba(26,20,16,0.4)"></span>
+        <button class="btn-nav primary" id="btnNext" onclick="nextQuestion()">Selanjutnya →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="view" id="view-result">
+    <div class="result-container">
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;">Hasil Latihan</div>
+      <div class="result-score-circle">
+        <div class="result-score-num" id="resultPercent">0</div>
+        <div class="result-score-lbl">dari 100</div>
+      </div>
+      <div class="result-grade" id="resultGrade">—</div>
+      <div class="result-msg" id="resultMsg">—</div>
+      <div class="result-breakdown">
+        <div class="breakdown-cell">
+          <div class="breakdown-num" id="rCorrect" style="color:var(--sage)">0</div>
+          <div class="breakdown-lbl">Benar</div>
+        </div>
+        <div class="breakdown-cell">
+          <div class="breakdown-num" id="rWrong" style="color:var(--rust)">0</div>
+          <div class="breakdown-lbl">Salah</div>
+        </div>
+        <div class="breakdown-cell">
+          <div class="breakdown-num" id="rSkip" style="color:var(--amber)">0</div>
+          <div class="breakdown-lbl">Dilewati</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="retryQuiz()">Coba Lagi</button>
+        <button class="btn-secondary" onclick="showView('home')">Kembali ke Beranda</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const QUESTIONS = {
+  ars: [
+    {
+      q: "Siapakah arsitek yang merancang Masjid Istiqlal Jakarta?",
+      sub: "Masjid Istiqlal adalah masjid terbesar di Asia Tenggara dan simbol kemerdekaan Indonesia.",
+      opts: ["Soejoedi Wirjoatmodjo","Friedrich Silaban","Han Awal","Ridwan Kamil"],
+      ans: 1,
+      exp: "Friedrich Silaban (1912–1984) memenangkan sayembara desain Masjid Istiqlal pada 1954. Konstruksi selesai dan masjid dibuka secara resmi tahun 1978."
+    },
+    {
+      q: "Prinsip 'form follows function' dalam arsitektur dikemukakan oleh?",
+      sub: "Prinsip ini menjadi fondasi pemikiran arsitektur Modernisme awal abad 20.",
+      opts: ["Le Corbusier","Mies van der Rohe","Louis Sullivan","Frank Lloyd Wright"],
+      ans: 2,
+      exp: "Louis Sullivan (1856–1924), arsitek Amerika, pertama kali menyatakan 'form follows function' pada esainya tahun 1896, yang kemudian menjadi mantra Modernisme."
+    },
+    {
+      q: "Orde arsitektur Yunani manakah yang memiliki kepala kolom (kapitel) berbentuk daun akantus?",
+      sub: "Tiga orde utama Yunani Kuno adalah Dorik, Ionik, dan Korintian.",
+      opts: ["Dorik","Ionik","Korintian","Toskan"],
+      ans: 2,
+      exp: "Orde Korintian adalah yang paling dekoratif di antara tiga orde Yunani, ditandai kapitel yang dihiasi daun akantus. Kolom Korintian lebih ramping dari Dorik."
+    },
+    {
+      q: "Konsep 'Organic Architecture' yang menekankan harmoni bangunan dengan alam dikembangkan oleh?",
+      sub: "Salah satu karyanya yang terkenal adalah Fallingwater (1935) di Pennsylvania, AS.",
+      opts: ["Le Corbusier","Tadao Ando","Frank Lloyd Wright","Zaha Hadid"],
+      ans: 2,
+      exp: "Frank Lloyd Wright mengembangkan Organic Architecture — bangunan harus tumbuh dari tapak layaknya organisme hidup. Fallingwater dibangun langsung di atas air terjun, menyatukan arsitektur dengan alam."
+    },
+    {
+      q: "Sistem struktur bangunan menggunakan busur melengkung yang mendistribusikan beban ke samping disebut?",
+      sub: "Sistem ini memungkinkan bangunan mencapai bentang lebih lebar dibanding post-and-lintel.",
+      opts: ["Post-and-lintel","Arch system","Cantilever","Space frame"],
+      ans: 1,
+      exp: "Arch system (sistem busur) mengubah beban vertikal menjadi gaya tekan yang disalurkan secara diagonal ke tumpuan di kedua sisi. Romawi Kuno menggunakan ini secara masif untuk jembatan, saluran air, dan bangunan umum."
+    },
+    {
+      q: "Lima Poin Arsitektur Modern (Five Points of New Architecture) dikemukakan oleh?",
+      sub: "Poin-poin ini meliputi pilotis, roof garden, open plan, ribbon windows, dan free facade.",
+      opts: ["Walter Gropius","Le Corbusier","Mies van der Rohe","Alvar Aalto"],
+      ans: 1,
+      exp: "Le Corbusier mempublikasikan Five Points of New Architecture pada 1926. Poin-poin ini memungkinkan bangunan modern melayang di atas tanah (pilotis), memiliki atap hijau, denah bebas, jendela horizontal panjang, dan fasad yang independen dari struktur."
+    },
+    {
+      q: "Gaya arsitektur yang ditandai oleh bentuk-bentuk cair, parametrik, dan seakan menantang gravitasi dikembangkan oleh?",
+      sub: "Arsitek ini adalah wanita pertama yang memenangkan Pritzker Prize (2004).",
+      opts: ["Zaha Hadid","Renzo Piano","Daniel Libeskind","Frank Gehry"],
+      ans: 0,
+      exp: "Zaha Hadid (1950–2016) adalah pelopor deconstructivism dan parametric design. Ia menggunakan perangkat lunak canggih untuk menciptakan bentuk-bentuk dinamis yang sebelumnya tidak mungkin dibangun."
+    },
+    {
+      q: "Katedral Gothik umumnya menggunakan elemen struktural eksterior yang menyalurkan beban dari dinding ke tumpuan luar, disebut?",
+      sub: "Elemen ini memungkinkan dinding lebih tipis sehingga dapat diisi kaca patri yang luas.",
+      opts: ["Barrel vault","Flying buttress","Pendentive","Squinch"],
+      ans: 1,
+      exp: "Flying buttress adalah lengkung eksterior yang 'terbang' dari dinding utama ke pier (pilar) di luar bangunan. Ini memungkinkan dinding Gothik menjadi sangat tipis dan penuh bukaan kaca — sesuatu yang tidak mungkin dalam Romanesque."
+    },
+    {
+      q: "Prinsip desain 'Less is more' menjadi semboyan arsitek?",
+      sub: "Arsitek ini juga dikenal dengan Pavilion Barcelona dan Seagram Building di New York.",
+      opts: ["Philip Johnson","Louis Kahn","Mies van der Rohe","Richard Meier"],
+      ans: 2,
+      exp: "Ludwig Mies van der Rohe (1886–1969) menerapkan 'Less is more' — kesederhanaan material premium, ruang yang mengalir, dan detail yang sangat presisi. Barcelona Pavilion (1929) adalah manifesto minimalismenya."
+    },
+    {
+      q: "Dalam teori arsitektur, Golden Ratio (Rasio Emas) memiliki nilai kira-kira?",
+      sub: "Rasio ini banyak ditemukan di alam dan digunakan dalam komposisi arsitektur sejak zaman Yunani.",
+      opts: ["1 : 1.414","1 : 1.618","1 : 2","1 : 1.732"],
+      ans: 1,
+      exp: "Golden Ratio (φ/phi) ≈ 1:1.618. Rasio ini dianggap paling estetis secara visual dan ditemukan di banyak karya agung, dari Parthenon hingga fasad Notre Dame, serta di alam seperti spiral keong dan susunan bunga matahari."
+    }
+  ],
+  tpa: [
+    {
+      q: "Sebuah kubus diamati dari arah depan memperlihatkan bentuk persegi. Jika diamati dari pojok atas-kiri, bentuk apa yang terlihat?",
+      sub: "Pertanyaan ini menguji kemampuan visualisasi tiga dimensi.",
+      opts: ["Segitiga","Persegi panjang","Heksagon reguler","Trapesium"],
+      ans: 2,
+      exp: "Jika kubus dilihat secara isometrik dari pojok (diagonal depan-atas), ketiga bidang yang terlihat (atas, depan, samping) akan membentuk heksagon reguler — ini adalah proyeksi isometrik klasik kubus."
+    },
+    {
+      q: "Pola: 2, 6, 18, 54, ... Bilangan berikutnya adalah?",
+      sub: "Identifikasi pola perkalian antar suku.",
+      opts: ["108","162","216","270"],
+      ans: 1,
+      exp: "Setiap suku dikalikan 3: 2×3=6, 6×3=18, 18×3=54, 54×3=162. Jawabannya adalah 162."
+    },
+    {
+      q: "Jika MEJA dianalogikan dengan DUDUK, maka RANJANG dianalogikan dengan?",
+      sub: "Soal analogi — identifikasi hubungan fungsional antar kata.",
+      opts: ["Istirahat","Kamar","Bantal","Tidur"],
+      ans: 3,
+      exp: "MEJA adalah tempat untuk DUDUK (aktivitas utama yang dilakukan di meja). Secara analogi, RANJANG adalah tempat untuk TIDUR (aktivitas utama yang dilakukan di ranjang)."
+    },
+    {
+      q: "Sebuah denah lantai berukuran 10m × 8m digambar dengan skala 1:100. Ukuran gambar di kertas adalah?",
+      sub: "Kemampuan membaca skala gambar teknik sangat dibutuhkan dalam studi arsitektur.",
+      opts: ["1cm × 0,8cm","10cm × 8cm","100cm × 80cm","0,1cm × 0,08cm"],
+      ans: 1,
+      exp: "Skala 1:100 artinya 1 unit di gambar = 100 unit di kenyataan. Maka 10m (1000cm) ÷ 100 = 10cm, dan 8m (800cm) ÷ 100 = 8cm. Gambar berukuran 10cm × 8cm."
+    },
+    {
+      q: "Dari serangkaian bentuk: ○ △ □ ○ △ □ ○ △ ___, bentuk selanjutnya adalah?",
+      sub: "Uji kemampuan pengenalan pola visual berulang.",
+      opts: ["○","△","□","◇"],
+      ans: 2,
+      exp: "Pola berulang adalah ○ △ □ (tiga bentuk). Posisi ke-9 adalah akhir putaran ketiga, yaitu □ (kotak/persegi)."
+    },
+    {
+      q: "Kata yang berlawanan arti (antonim) dari MASIF adalah?",
+      sub: "Istilah ini sering digunakan dalam konteks arsitektur untuk mendeskripsikan elemen bangunan.",
+      opts: ["Berat","Padat","Berongga","Kokoh"],
+      ans: 2,
+      exp: "MASIF berarti padat, solid, dan tidak berongga. Antonimnya adalah BERONGGA (hollow/void) — ruang kosong di dalam suatu massa. Dalam arsitektur, hubungan solid-void adalah prinsip komposisi penting."
+    },
+    {
+      q: "Sebuah ruangan berbentuk L terdiri dari dua persegi panjang: 6m×4m dan 3m×2m. Luas total ruangan tersebut adalah?",
+      sub: "Kemampuan menghitung luas denah adalah kompetensi dasar arsitektur.",
+      opts: ["24 m²","30 m²","36 m²","18 m²"],
+      ans: 1,
+      exp: "Luas = (6×4) + (3×2) = 24 + 6 = 30 m². Ruangan bentuk L dapat dihitung dengan membaginya menjadi dua persegi panjang terpisah kemudian menjumlahkan luasnya."
+    },
+    {
+      q: "Sinonim dari kata ESTETIKA adalah?",
+      sub: "Estetika adalah konsep fundamental dalam pendidikan arsitektur.",
+      opts: ["Etika","Keindahan","Keaslian","Fungsi"],
+      ans: 1,
+      exp: "ESTETIKA berasal dari bahasa Yunani 'aisthetikos' yang berarti persepsi sensoris, khususnya keindahan. Dalam arsitektur, estetika merujuk pada kualitas visual dan pengalaman ruang yang menyenangkan indera."
+    }
+  ],
+  verbal: [
+    {
+      q: "Kata FASAD dalam arsitektur merujuk pada?",
+      sub: "Istilah teknis arsitektur ini sering muncul dalam soal TPA verbal dan pengetahuan umum.",
+      opts: ["Atap bangunan","Tampak depan bangunan","Denah lantai","Potongan bangunan"],
+      ans: 1,
+      exp: "FASAD (dari bahasa Prancis 'façade') adalah tampak muka/depan sebuah bangunan. Ini adalah 'wajah' bangunan yang paling sering dilihat orang dari jalan atau ruang publik."
+    },
+    {
+      q: "Hubungan yang tepat antara 'Denah' dan 'Potongan' dalam gambar arsitektur adalah?",
+      sub: "Pemahaman jenis-jenis gambar kerja adalah kompetensi dasar calon mahasiswa arsitektur.",
+      opts: [
+        "Denah = potongan horizontal, Potongan = potongan vertikal",
+        "Denah = tampak depan, Potongan = tampak samping",
+        "Keduanya adalah proyeksi horizontal",
+        "Denah = 3D, Potongan = 2D"
+      ],
+      ans: 0,
+      exp: "Denah (plan) adalah irisan/potongan horizontal bangunan yang memperlihatkan tata ruang dari atas. Potongan (section) adalah irisan vertikal yang memperlihatkan ketinggian ruang, ketebalan lantai, dan hubungan antar lantai."
+    },
+    {
+      q: "Antonim dari kata KONTEMPORER dalam konteks arsitektur adalah?",
+      sub: "Pemahaman kosakata temporal penting dalam diskusi tentang gaya arsitektur.",
+      opts: ["Modern","Klasik","Vernakular","Futuristik"],
+      ans: 1,
+      exp: "KONTEMPORER artinya 'masa kini, zaman sekarang'. Antonim yang paling tepat dalam konteks arsitektur adalah KLASIK, yang merujuk pada gaya dari masa lampau (Yunani-Romawi Kuno). Keduanya sering diperbandingkan dalam diskusi gaya arsitektur."
+    }
+  ],
+  mtk: [
+    {
+      q: "Sebuah bangunan memiliki denah persegi dengan sisi 12 meter. Jika sekeliling bangunan dipasang pagar dengan harga Rp 150.000/meter, berapa total biaya pagar?",
+      sub: "Soal aplikasi geometri dan perhitungan biaya konstruksi sederhana.",
+      opts: ["Rp 5.400.000","Rp 7.200.000","Rp 21.600.000","Rp 2.160.000"],
+      ans: 1,
+      exp: "Keliling persegi = 4 × 12 = 48 meter. Biaya total = 48 × Rp 150.000 = Rp 7.200.000."
+    },
+    {
+      q: "Sebuah ruangan berbentuk silinder dengan jari-jari 3,5m dan tinggi 4m. Volume ruangan tersebut adalah? (π ≈ 22/7)",
+      sub: "Kemampuan menghitung volume bentuk geometri adalah dasar perancangan arsitektur.",
+      opts: ["154 m³","176 m³","132 m³","198 m³"],
+      ans: 0,
+      exp: "V = π × r² × h = 22/7 × 3.5² × 4 = 22/7 × 12.25 × 4 = 22 × 1.75 × 4 = 154 m³"
+    },
+    {
+      q: "Sebuah tangga memiliki 15 anak tangga dengan ketinggian total 3 meter. Tinggi satu anak tangga (tanjakan/riser) adalah?",
+      sub: "Standar kenyamanan tangga (riser 17–20cm, tread 28–30cm) adalah pengetahuan penting calon arsitek.",
+      opts: ["15 cm","20 cm","25 cm","18 cm"],
+      ans: 1,
+      exp: "Tinggi satu anak tangga = Total tinggi ÷ jumlah anak tangga = 300cm ÷ 15 = 20cm. Nilai 20cm masih dalam rentang nyaman untuk riser tangga (17–20cm)."
+    }
+  ]
+};
+
+let currentQuiz = [];
+let currentIdx = 0;
+let answers = [];
+let timerInterval = null;
+let timeLeft = 0;
+let quizType = '';
+let totalScore = 0;
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    const views = ['home','materi'];
+    t.classList.toggle('active', views[i] === name);
+  });
+}
+
+function showMateri(topic) {
+  showView('materi');
+  const items = document.querySelectorAll('.sidebar-item');
+  const panels = document.querySelectorAll('.materi-panel');
+  items.forEach(i => i.classList.remove('active'));
+  panels.forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + topic).classList.add('active');
+  // Mark correct sidebar item
+  const map = ['sejarah','ruang','struktur','tokoh'];
+  items[map.indexOf(topic)]?.classList.add('active');
+}
+
+function switchMateri(topic, el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.materi-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + topic).classList.add('active');
+}
+
+function startQuiz(type) {
+  quizType = type;
+  currentQuiz = QUESTIONS[type] || QUESTIONS.ars;
+  currentIdx = 0;
+  answers = new Array(currentQuiz.length).fill(null);
+  clearInterval(timerInterval);
+  timeLeft = currentQuiz.length * 90;
+  showView('quiz');
+
+  const labels = { ars: 'Pengetahuan Arsitektur', tpa: 'TPA — Figural & Numerik', verbal: 'TPA — Verbal', mtk: 'Matematika Dasar' };
+  document.getElementById('quizCategory').textContent = labels[type] || 'Latihan Soal';
+  document.getElementById('quizTitle').textContent = 'UTBK Arsitektur ' + new Date().getFullYear();
+
+  renderQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); finishQuiz(); }
+    if (timeLeft <= 60) document.getElementById('timerDisplay').style.color = '#c0392b';
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+  const s = (timeLeft % 60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+}
+
+function renderQuestion() {
+  const q = currentQuiz[currentIdx];
+  const total = currentQuiz.length;
+
+  document.getElementById('questionNum').textContent = `Soal ${currentIdx + 1} dari ${total}`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('questionSub').textContent = q.sub || '';
+  document.getElementById('progressFill').style.width = ((currentIdx + 1) / total * 100) + '%';
+  document.getElementById('dotNav').textContent = `${currentIdx + 1} / ${total}`;
+
+  const exp = document.getElementById('explanation');
+  exp.classList.remove('show');
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const letters = ['A','B','C','D','E'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    if (answers[currentIdx] !== null) {
+      if (i === q.ans) div.classList.add('correct');
+      else if (i === answers[currentIdx]) div.classList.add('wrong');
+    } else if (answers[currentIdx] === i) {
+      div.classList.add('selected');
+    }
+    div.innerHTML = `<div class="option-letter">${letters[i]}</div><div class="option-text">${opt}</div>`;
+    div.onclick = () => selectAnswer(i);
+    list.appendChild(div);
+  });
+
+  if (answers[currentIdx] !== null) {
+    showExplanation();
+  }
+
+  document.getElementById('btnBack').disabled = currentIdx === 0;
+  const btnNext = document.getElementById('btnNext');
+  if (currentIdx === total - 1) {
+    btnNext.textContent = 'Selesai ✓';
+  } else {
+    btnNext.textContent = 'Selanjutnya →';
+  }
+}
+
+function selectAnswer(idx) {
+  if (answers[currentIdx] !== null) return;
+  answers[currentIdx] = idx;
+  renderQuestion();
+}
+
+function showExplanation() {
+  const q = currentQuiz[currentIdx];
+  const exp = document.getElementById('explanation');
+  const correct = q.opts[q.ans];
+  exp.innerHTML = `<strong>✓ Jawaban benar: ${correct}</strong><br><br>${q.exp}`;
+  exp.classList.add('show');
+}
+
+function nextQuestion() {
+  if (currentIdx === currentQuiz.length - 1) { finishQuiz(); return; }
+  currentIdx++;
+  renderQuestion();
+}
+
+function prevQuestion() {
+  if (currentIdx > 0) { currentIdx--; renderQuestion(); }
+}
+
+function finishQuiz() {
+  clearInterval(timerInterval);
+  let correct = 0;
+  currentQuiz.forEach((q, i) => { if (answers[i] === q.ans) correct++; });
+  const wrong = answers.filter((a, i) => a !== null && a !== currentQuiz[i].ans).length;
+  const skip = answers.filter(a => a === null).length;
+  const pct = Math.round(correct / currentQuiz.length * 100);
+
+  totalScore += correct * 10;
+  document.getElementById('totalScore').textContent = totalScore;
+
+  document.getElementById('resultPercent').textContent = pct;
+  document.getElementById('rCorrect').textContent = correct;
+  document.getElementById('rWrong').textContent = wrong;
+  document.getElementById('rSkip').textContent = skip;
+
+  let grade, msg;
+  if (pct >= 85) { grade = '🏆 Sangat Baik'; msg = 'Luar biasa! Nilaimu sangat bagus. Pertahankan semangat belajar ini menuju UTBK.'; }
+  else if (pct >= 70) { grade = '👍 Baik'; msg = 'Bagus! Kamu sudah memahami materi dengan baik. Sedikit latihan lagi dan kamu siap!'; }
+  else if (pct >= 55) { grade = '📚 Cukup'; msg = 'Lumayan. Review kembali materi yang masih kurang dan ulangi latihan soal.'; }
+  else { grade = '💪 Perlu Belajar Lebih'; msg = 'Jangan menyerah! Pelajari materi secara mendalam dan latihan lebih banyak soal.'; }
+
+  document.getElementById('resultGrade').textContent = grade;
+  document.getElementById('resultMsg').textContent = msg;
+  showView('result');
+}
+
+function retryQuiz() { startQuiz(quizType); }
+</script>
+</body>
+</html>
